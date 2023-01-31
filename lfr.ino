@@ -106,6 +106,7 @@ void loop() {
     Serial.println("start clicked");
     onoff =! onoff;
     if(onoff = true) {
+      digitalWrite(LED_BUILTIN, HIGH);
       delay(1000);//a delay when the robot starts
     }
     else {
@@ -275,14 +276,18 @@ void robot_control() {
     // error = 3500;
     error = 3000;
 
-  // intersection
-  if(cnt == 8){
+  // no lines which means sonar transition or line gap---------------------------------------------------------------------
+  if(cnt == 0){
+    debugging("--> no line ");
+    PID(0);
+  }
+
+  // intersection----------------------------------------------------------------------------------------------------------
+  else if(cnt == 8){
     debugging("--> intersection ");
     PID(0);
-    // delay(500);
-
   }
-  // for changing parity ie color
+  // for changing parity ie color------------------------------------------------------------------------------------------
   else if(((sensorValues[0] == 1 || sensorValues[1] == 1) && (sensorValues[6] == 1 && sensorValues[7] == 1)) &&
    (sensorValues[2]==0 || sensorValues[3]==0 || sensorValues[4]==0 || sensorValues[5]==0 ))
   {
