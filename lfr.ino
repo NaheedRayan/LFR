@@ -1,7 +1,5 @@
 
-/*************************************************************************
-* Sensor Upper and Lower Threshold
-*************************************************************************/
+// Sensor Upper and Lower Threshold
 int sensor_threshold_u = 900;
 int sensor_threshold_l = 200;
 
@@ -86,16 +84,10 @@ void setup() {
   pinMode(in4, OUTPUT);
 
   Serial.begin(38400);// Read in baud 9600 if using arduino nano
-
   pinMode(LED_BUILTIN, OUTPUT);
+  
   boolean Ok = false;
-  // while (Ok == false) { // the main function won't start until the robot is calibrated
-  //   if(digitalRead(buttoncalibrate) == HIGH) {
-  //     Serial.println("calibrate clicked");
-  //     // calibration(); //calibrate the robot for 10 seconds
-  //     // Ok = true;
-  //   }
-  // }
+ 
   Ok = true ;
   delay(1000);
 
@@ -107,16 +99,6 @@ void setup() {
 /*************************************************************************
 * Function Name: loop
 **************************************************************************
-* Summary:
-* This is the main function of this application. When the start button is
-* pressed, the robot will toggle between following the track and stopping.
-* When following the track, the function calls the PID control method. 
-* 
-* Parameters:
-*  none
-* 
-* Returns:
-*  none
 *************************************************************************/
 void loop() {
 
@@ -167,13 +149,8 @@ void forward_brake(int posa, int posb) {
   analogWrite(enB, posb);
 }
 
-//go right
+//go right -->
 void left_brake(int posa, int posb) {
-  // digitalWrite(aphase, LOW);
-  // digitalWrite(bphase, LOW);
-  // analogWrite(aenbl, posa);
-  // analogWrite(benbl, posb);
-
   digitalWrite(in1, LOW);
   digitalWrite(in2, HIGH);
   digitalWrite(in3, HIGH);
@@ -183,12 +160,8 @@ void left_brake(int posa, int posb) {
 }
 
 
-//go left
+//go left <--
 void right_brake(int posa, int posb) {
-  // digitalWrite(aphase, HIGH);
-  // digitalWrite(bphase, HIGH);
-  // analogWrite(aenbl, posa);
-  // analogWrite(benbl, posb);
   digitalWrite(in1, HIGH);
   digitalWrite(in2, LOW);
   digitalWrite(in3, LOW);
@@ -196,8 +169,6 @@ void right_brake(int posa, int posb) {
   analogWrite(enA, posa);
   analogWrite(enB, posb);
 }
-
-
 
 
 /*************************************************************************
@@ -224,12 +195,12 @@ int bw(int a)
 {
   if(a > sensor_threshold_l && a < sensor_threshold_u)
     return parity;//if black
-  // else if(a >= sensor_threshold_u )
-  //   return !parity;// if white
+  else if(a >= sensor_threshold_u) 
+    return !parity;
   else return !parity;
 }
 
-
+// for printing data for on serial port for debugging
 void debugging(String s){
   Serial.print(sensorValues[0]);
   Serial.print(sensorValues[1]);
@@ -244,11 +215,12 @@ void debugging(String s){
   Serial.println("");
 }
 
+
+// refreshing the sensor data in the sensorValues field
 void read_sensor_data()
 {
   for (int i = 0; i < 8; i++) 
     sensorValues[i] = bw(analogRead(7-i)); 
-
 }
 
 
@@ -274,11 +246,17 @@ void robot_control() {
     sensors_sum += sensorValues[i];
 
     sum = sensors_sum ;/////////////////////
-
-    
-
   }
   
+
+  int rcnt = 0 , lcnt = 0 ;
+  // reading ++++++--
+  for(int i = 0 ; i < 6 ; i++)
+    lcnt += sensorValues[i] ;
+  // reading --++++++
+  for(int i = 2 ; i < 8 ; i++)
+    rcnt += sensorValues[i] ;
+    
 
 
 
@@ -307,58 +285,38 @@ void robot_control() {
     parity = !parity ;
     debugging("--> change ");
   }
-  // //left 90  
-  // else if(
-  //   (sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1 && sensorValues[3] == 1 && sensorValues[4] == 1) 
-  // ||(sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1 && sensorValues[3] == 1)){
-
-  //   debugging("--> left 90 ");
-  //   // right_brake(80, 80);
-
-  //   do{
-  //     read_sensor_data();//updating data
-  //     // forward_brake(0,110);
-  //     right_brake(40, 100);
-
-  //   }while(sensorValues[3] != 1);
-
-  //   debugging("--> left 90 done ");
-
-
-  // }
-  // //right 90  
-  // else if(
-  //   (sensorValues[3] == 1 && sensorValues[4] == 1 && sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) 
-  // ||(sensorValues[4] == 1 && sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1)){
-    
-  //   debugging("--> right 90 ");
-
-  //   do{
-  //     read_sensor_data();//updating data
-  //     // forward_brake(110,0);
-  //     left_brake(100, 40);
-
-  //   }while(sensorValues[5] != 1);
-
-  //   debugging("--> right 90 done ");
-
-
-
-  // }
-  //left 30
+  //left 90 ---------------------------------------------------------------------------------------------------------------- 
   else if(
-    // (sensorValues[0] == 1 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 1 && sensorValues[4] == 0 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0) ||
-    // (sensorValues[0] == 1 && sensorValues[1] == 0 && sensorValues[2] == 1 && sensorValues[3] == 1 && sensorValues[4] == 0 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0) ||
-    // (sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 0 && sensorValues[3] == 1 && sensorValues[4] == 0 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 0)
-    (sensorValues[0] == 1 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 1 ) ||
-    (sensorValues[0] == 1 && sensorValues[1] == 0 && sensorValues[2] == 1 && sensorValues[3] == 1 ) ||
-    (sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 0 && sensorValues[3] == 1 )
+    (sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1 && sensorValues[3] == 1 && sensorValues[4] == 1) 
+  ||(sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[2] == 1 && sensorValues[3] == 1)){
 
-    ){
+    debugging("--> left 90 ");
+    do{
+      read_sensor_data();//updating data
+      right_brake(70, 70);
+    }while(sensorValues[3] != 1);
+    debugging("--> left 90 done ");
+
+
+  }
+  //right 90 --------------------------------------------------------------------------------------------------------------- 
+  else if(
+    (sensorValues[3] == 1 && sensorValues[4] == 1 && sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) 
+  ||(sensorValues[4] == 1 && sensorValues[5] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1)){
+    
+    debugging("--> right 90 ");
+    do{
+      read_sensor_data();//updating data
+      left_brake(70, 70);
+    }while(sensorValues[5] != 1);
+    debugging("--> right 90 done ");
+  }
+
+  //left 30 ----------------------------------------------------------------------------------------------------------------
+  else if((sensorValues[0] == 1 && sensorValues[1] == 1 && (rcnt > 0))){
 
     debugging(" --> left 30 ");
-  
-  
+
     do{
       read_sensor_data();//updating data
       debugging(" --> UPDATE ");
@@ -382,18 +340,9 @@ void robot_control() {
     debugging("--> left 30 done ");
 
   }
-  //right 30
-  else if(
-    // (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 0 && sensorValues[4] == 1 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 1) ||
-    // (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 0 && sensorValues[4] == 1 && sensorValues[5] == 0 && sensorValues[6] == 1 && sensorValues[7] == 1) ||
-    // (sensorValues[0] == 0 && sensorValues[1] == 0 && sensorValues[2] == 0 && sensorValues[3] == 0 && sensorValues[4] == 1 && sensorValues[5] == 1 && sensorValues[6] == 0 && sensorValues[7] == 1)
-    (sensorValues[4] == 1 && sensorValues[5] == 0 && sensorValues[6] == 0 && sensorValues[7] == 1) ||
-    (sensorValues[4] == 1 && sensorValues[5] == 0 && sensorValues[6] == 1 && sensorValues[7] == 1) ||
-    (sensorValues[4] == 1 && sensorValues[5] == 1 && sensorValues[6] == 0 && sensorValues[7] == 1)
-    ){
-
+  //right 30 -----------------------------------------------------------------------------------------------------------------
+  else if(sensorValues[6]==0 && sensorValues[7]==1 && (lcnt > 0)){
     debugging(" --> right 30 ");
-
     do{
       read_sensor_data();//updating data
       debugging(" --> UPDATE ");
@@ -417,6 +366,7 @@ void robot_control() {
     debugging("--> right 30 done ");
 
   }
+  // -------------------------------------------------------------------------------------------------------------------------
   else
   {
     debugging("--> PID ");
@@ -427,6 +377,8 @@ void robot_control() {
   
 }
 
+
+//PID controller
 void PID(int error){
   P = error;
   I = I + error;
