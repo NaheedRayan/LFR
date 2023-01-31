@@ -1,4 +1,4 @@
-
+// Written by Naheed
 // Sensor Upper and Lower Threshold
 int sensor_threshold_u = 900;
 int sensor_threshold_l = 200;
@@ -275,15 +275,19 @@ void robot_control() {
     // error = 3500;
     error = 3000;
 
+  // intersection
   if(cnt == 8){
     debugging("--> intersection ");
     PID(0);
     // delay(500);
 
   }
-  else if((sensorValues[0] == 1 && sensorValues[1] == 1 && sensorValues[6] == 1 && sensorValues[7] == 1) && (cnt != 8 && cnt != 0)){
+  // for changing parity ie color
+  else if(((sensorValues[0] == 1 || sensorValues[1] == 1) && (sensorValues[6] == 1 && sensorValues[7] == 1)) &&
+   (sensorValues[2]==0 || sensorValues[3]==0 || sensorValues[4]==0 || sensorValues[5]==0 ))
+  {
     parity = !parity ;
-    debugging("--> change ");
+    debugging("--> parity change ");
   }
   //left 90 ---------------------------------------------------------------------------------------------------------------- 
   else if(
@@ -313,7 +317,7 @@ void robot_control() {
   }
 
   //left 30 ----------------------------------------------------------------------------------------------------------------
-  else if((sensorValues[0] == 1 && sensorValues[1] == 1 && (rcnt > 0))){
+  else if((sensorValues[0] == 1 || sensorValues[1] == 1) && (rcnt > 0)){
 
     debugging(" --> left 30 ");
 
@@ -333,7 +337,7 @@ void robot_control() {
     debugging(" --> left 30 step ");
     do{
       read_sensor_data();//updating data
-      right_brake(100, 100);
+      right_brake(80, 80);
       // forward_brake(0,110);
     }while(sensorValues[3] != 1);
 
@@ -341,7 +345,7 @@ void robot_control() {
 
   }
   //right 30 -----------------------------------------------------------------------------------------------------------------
-  else if(sensorValues[6]==0 && sensorValues[7]==1 && (lcnt > 0)){
+  else if((sensorValues[6]==1 || sensorValues[7]==1) && (lcnt > 0)){
     debugging(" --> right 30 ");
     do{
       read_sensor_data();//updating data
@@ -359,7 +363,7 @@ void robot_control() {
     debugging(" --> right 30 step ");
     do{
       read_sensor_data();//updating data
-      left_brake(100, 100);
+      left_brake(80, 80);
       // forward_brake(0,110);
     }while(sensorValues[4] != 1);
 
